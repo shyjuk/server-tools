@@ -71,11 +71,10 @@ class MaterializedSqlView(models.Model):
     def refresh_materialized_view(self):
         result = []
         matviews_performed = []
-        ir_model = self.env['ir.model']
         for matview in self:
             if matview.matview_name in matviews_performed:
                 continue
-            model = ir_model.browse(matview.model_id).model
+            model = matview.model_id.model
             matview_mdl = self.env[model]
             result.append(matview_mdl.refresh_materialized_view())
             matviews_performed.append(matview.matview_name)

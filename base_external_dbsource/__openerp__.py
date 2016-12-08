@@ -5,7 +5,9 @@
     'name': 'External Database Sources',
     'version': '9.0.1.0.1',
     'category': 'Tools',
-    'author': "Daniel Reis,Odoo Community Association (OCA)",
+    'author': "Daniel Reis, "
+              "LasLabs, "
+              "Odoo Community Association (OCA)",
     'website': 'https://github.com/OCA/server-tools',
     'license': 'LGPL-3',
     'images': [

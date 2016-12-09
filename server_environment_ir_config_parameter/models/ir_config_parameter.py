@@ -2,9 +2,9 @@
 # Copyright 2016 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from openerp import api, models, _, SUPERUSER_ID
-from openerp.exceptions import UserError
-from openerp.addons.server_environment import serv_config
+from odoo import api, models, _, SUPERUSER_ID
+from odoo.exceptions import UserError
+from odoo.addons.server_environment import serv_config
 
 
 SECTION = 'ir.config_parameter'

@@ -111,6 +111,7 @@ Contributors
 * Nicolas Bessi <nicolas.bessi@camptocamp.com>
 * Wingo
 * Yannick Vaucher <yannick.vaucher@camptocamp.com>
+* Ted Salmon <tsalmon@laslabs.com>
 
 
 Maintainer

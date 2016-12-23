@@ -19,6 +19,7 @@
 #
 ##############################################################################
 
+import logging
 import os
 import ConfigParser
 from lxml import etree
@@ -29,29 +30,19 @@ from openerp.tools.config import config as system_base_config
 
 from .system_info import get_server_environment
 
-from openerp.addons import server_environment_files
-_dir = os.path.dirname(server_environment_files.__file__)
+_logger = logging.getLogger(__name__)
+
+try:
+    from openerp.addons import server_environment_files
+    _dir = os.path.dirname(server_environment_files.__file__)
+except ImportError:
+    _logger.info('ImportError raised while trying to load '
+                 '`server_environment_files`')
+    _logger.debug('Import Error Details: ', exc_info=True)
 
 # Same dict as RawConfigParser._boolean_states
 _boolean_states = {'1': True, 'yes': True, 'true': True, 'on': True,
                    '0': False, 'no': False, 'false': False, 'off': False}
-
-if not system_base_config.get('running_env', False):
-    raise Exception(
-        "The parameter 'running_env' has not be set neither in base config "
-        "file option -c or in openerprc.\n"
-        "We strongly recommend against using the rc file but instead use an "
-        "explicit config file with this content:\n"
-        "[options]\nrunning_env = dev"
-    )
-
-ck_path = os.path.join(_dir, system_base_config['running_env'])
-
-if not os.path.exists(ck_path):
-    raise Exception(
-        "Provided server environment does not exist, "
-        "please add a folder %s" % ck_path
-    )
 
 
 def setboolean(obj, attr, _bool=None):
@@ -83,6 +74,23 @@ def _listconf(env_path):
 
 def _load_config():
     """Load the configuration and return a ConfigParser instance."""
+    if not system_base_config.get('running_env', False):
+        raise EnvironmentError(
+            "The parameter 'running_env' is not set in the base config file, "
+            "option -c or in openerprc.\n"
+            "We strongly discourage the use of an rc file and instead "
+            "recommend you explicitly add the following options into your "
+            "config:\n[options]\nrunning_env = [dev|prod]"
+        )
+
+    ck_path = os.path.join(_dir, system_base_config['running_env'])
+
+    if not os.path.exists(ck_path):
+        raise EnvironmentError(
+            "Provided server environment does not exist, "
+            "please add a folder %s" % ck_path
+        )
+
     default = os.path.join(_dir, 'default')
     running_env = os.path.join(_dir,
                                system_base_config['running_env'])
@@ -97,13 +105,21 @@ def _load_config():
     try:
         config_p.read(conf_files)
     except Exception as e:
-        raise Exception('Cannot read config files "%s":  %s' % (conf_files, e))
+        raise EnvironmentError(
+            'Cannot read config files "%s":  %s' % (conf_files, e)
+        )
     config_p.read(system_base_config.rcfile)
     config_p.remove_section('options')
 
     return config_p
 
-serv_config = _load_config()
+
+try:
+    serv_config = _load_config()
+except EnvironmentError:
+    _logger.info('Could not load `serv_config` due to missing or corrupt '
+                 'configuration options or files')
+    _logger.debug('EnvironmentError raised: %s', exc_info=True)
 
 
 class _Defaults(dict):

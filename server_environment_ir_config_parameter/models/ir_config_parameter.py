@@ -2,7 +2,7 @@
 # Copyright 2016 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models, _, SUPERUSER_ID
+from odoo import api, models, _
 from odoo.exceptions import UserError
 from odoo.addons.server_environment import serv_config
 
@@ -28,7 +28,7 @@ class IrConfigParameter(models.Model):
                 # should we have preloaded values in database at,
                 # server startup, modules loading their parameters
                 # from data files would break on unique key error.
-                self.set_param(SUPERUSER_ID, key, cvalue)
+                self.sudo().set_param(key, cvalue)
                 value = cvalue
         if value is None:
             return default

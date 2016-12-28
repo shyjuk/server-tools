@@ -51,4 +51,4 @@ class IrConfigParameter(models.Model):
                 newvals = dict(vals, value=serv_config.get(SECTION, key))
             else:
                 newvals = vals
-            super(IrConfigParameter, rec).write(newvals)
+        return super(IrConfigParameter, rec).write(newvals)

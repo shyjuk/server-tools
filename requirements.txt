@@ -6,3 +6,5 @@ validate_email
 pysftp
 fdb
 sqlalchemy
+beautifulsoup4
+python-wordpress-xmlrpc

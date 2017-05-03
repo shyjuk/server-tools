@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+
+    <record id="cert_authority_revoke_view_form" model="ir.ui.view">
+        <field name="name">Cert Authority Revoke Form</field>
+        <field name="model">cert.authority.revoke</field>
+        <field name="arch" type="xml">
+            <form string="Revoke A Cert">
+                <sheet>
+                    <h1>
+                        <field name="cert_authority_id" />
+                    </h1>
+                    <group>
+                        <field name="cert_id"
+                               domain="[('cert_authority_id', '=', cert_authority_id)]"
+                               />
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_revoke"
+                            string="Revoke"
+                            type="object"
+                            />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="cert_authority_revoke_action" model="ir.actions.act_window">
+        <field name="name">Revoke A Cert</field>
+        <field name="res_model">cert.authority</field>
+        <field name="src_model">cert.authority.revoke</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="key2">client_action_multi</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

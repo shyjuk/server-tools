@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+    
+    <record id="application_template_cfssl"
+            model="application.template"
+            >
+        <field name="name">CFSSL</field>
+    </record>
+    
+    <record id="application_template_openssl"
+            model="application.template"
+            >
+        <field name="name">OpenSSL</field>
+    </record>
+    
+</odoo>

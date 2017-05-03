@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+
+    <record id="cert_authority_sign_view_form" model="ir.ui.view">
+        <field name="name">Cert Authority Sign Form</field>
+        <field name="model">cert.authority.sign</field>
+        <field name="arch" type="xml">
+            <form string="Sign A Cert Request">
+                <sheet>
+                    <h1>
+                        <field name="cert_authority_id" />
+                    </h1>
+                    <group>
+                        <group string="Signing">
+                            <field name="cert_request_id"
+                                   domain="[('cert_authority_id', '=', cert_authority_id)]"
+                                   />
+                            <field name="serial_sequence" />
+                        </group>
+                        <group string="Overrides">
+                            <field name="subject" />
+                            <field name="host_ids" />
+                    </group>
+                    <group string="Signed Cert"
+                           options="{'invisible': [('cert_id', '=', 0)]}"
+                           />
+                        <field name="cert_id" />
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_sign"
+                            string="Sign"
+                            type="object"
+                            />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="cert_authority_sign_action" model="ir.actions.act_window">
+        <field name="name">Sign A Cert</field>
+        <field name="res_model">cert.authority</field>
+        <field name="src_model">cert.authority.sign</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="key2">client_action_multi</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

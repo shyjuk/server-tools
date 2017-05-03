@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+
+    <record id="image_volume_cfssl_cert_store"
+            model="image.volume"
+            >
+        <field name="template_id" ref="image_template_cfssl_data" />
+        <field name="name">cert_store</field>
+        <field name="localpath">/var/pki</field>
+        <field name="user">root</field>
+    </record>
+
+</odoo>

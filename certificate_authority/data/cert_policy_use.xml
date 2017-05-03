@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     Created from options listed at https://github.com/cloudflare/cfssl/blob/86ecfbe5750ebf05565e4c80104d0a7919792fee/doc/cmd/cfssl.txt#L89
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+
+    <record id="cert_policy_use_cert_sign"
+            model="cert.policy.use"
+            >
+        <field name="name">Cert Signing</field>
+        <field name="code">cert sign</field>
+    </record>
+    
+    <record id="cert_policy_use_signing"
+            model="cert.policy.use"
+            >
+        <field name="name">Signing</field>
+        <field name="code">signing</field>
+    </record>
+    
+    <record id="cert_policy_use_smime"
+            model="cert.policy.use"
+            >
+        <field name="name">S/MIME</field>
+        <field name="code">s/mime</field>
+    </record>
+    
+    <record id="cert_policy_use_server_auth"
+            model="cert.policy.use"
+            >
+        <field name="name">Server Authentication</field>
+        <field name="code">server auth</field>
+    </record>
+    
+    <record id="cert_policy_use_client_auth"
+            model="cert.policy.use"
+            >
+        <field name="name">Client Authentication</field>
+        <field name="code">client auth</field>
+    </record>
+    
+    <record id="cert_policy_use_digital_signature"
+            model="cert.policy.use"
+            >
+        <field name="name">Digital Signatures</field>
+        <field name="code">digital signature</field>
+    </record>
+    
+    <record id="cert_policy_use_email_protection"
+            model="cert.policy.use"
+            >
+        <field name="name">Email Protection</field>
+        <field name="code">email protection</field>
+    </record>
+    
+    <record id="cert_policy_use_key_encipherment"
+            model="cert.policy.use"
+            >
+        <field name="name">Key Encipherment</field>
+        <field name="code">key encipherment</field>
+    </record>
+    
+    <record id="cert_policy_use_content_commitment"
+            model="cert.policy.use"
+            >
+        <field name="name">Content Commitment</field>
+        <field name="code">content commitment</field>
+    </record>
+    
+    <record id="cert_policy_use_key_agreement"
+            model="cert.policy.use"
+            >
+        <field name="name">Key Agreement</field>
+        <field name="code">key agreement</field>
+    </record>
+    
+    <record id="cert_policy_use_crl_sign"
+            model="cert.policy.use"
+            >
+        <field name="name">CRL Signing</field>
+        <field name="code">crl sign</field>
+    </record>
+    
+    <record id="cert_policy_use_encipher_only"
+            model="cert.policy.use"
+            >
+        <field name="name">Encipher Only</field>
+        <field name="code">encipher only</field>
+    </record>
+    
+    <record id="cert_policy_use_decipher_only"
+            model="cert.policy.use"
+            >
+        <field name="name">Decipher Only</field>
+        <field name="code">decipher only</field>
+    </record>
+    
+    <record id="cert_policy_use_any"
+            model="cert.policy.use"
+            >
+        <field name="name">Any</field>
+        <field name="code">any</field>
+    </record>
+    
+    <record id="cert_policy_use_code_signing"
+            model="cert.policy.use"
+            >
+        <field name="name">Code Signing</field>
+        <field name="code">code signing</field>
+    </record>
+    
+    <record id="cert_policy_use_ipsec_end_system"
+            model="cert.policy.use"
+            >
+        <field name="name">IPSEC End System</field>
+        <field name="code">ipsec end system</field>
+    </record>
+    
+    <record id="cert_policy_use_ipsec_tunnel"
+            model="cert.policy.use"
+            >
+        <field name="name">IPSEC Tunnel</field>
+        <field name="code">ipsec tunnel</field>
+    </record>
+    
+    <record id="cert_policy_use_ipsec_user"
+            model="cert.policy.use"
+            >
+        <field name="name">IPSEC User</field>
+        <field name="code">ipsec user</field>
+    </record>
+    
+    <record id="cert_policy_use_timestamping"
+            model="cert.policy.use"
+            >
+        <field name="name">Timestamping</field>
+        <field name="code">timestamping</field>
+    </record>
+    
+    <record id="cert_policy_use_ocscp_signing"
+            model="cert.policy.use"
+            >
+        <field name="name">OCSP Signing</field>
+        <field name="code">ocsp signing</field>
+    </record>
+    
+    <record id="cert_policy_use_microsoft_sgc"
+            model="cert.policy.use"
+            >
+        <field name="name">Microsoft SGC</field>
+        <field name="code">microsoft sgc</field>
+    </record>
+    
+    <record id="cert_policy_use_netscape_sgc"
+            model="cert.policy.use"
+            >
+        <field name="name">Netscape SGC</field>
+        <field name="code">netscape sgc</field>
+    </record>
+    
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+
+    <record id="image_cfssl_data" model="image">
+        <field name="name">image_cfssl_data</field>
+        <field name="template_ids"
+               eval="[(4, [ref('image_template_cfssl_data')])]"
+               />
+        <field name="parent_from">clouder/base:3.4</field>
+    </record>
+    
+    <record id="image_cfssl_exec" model="image">
+        <field name="name">image_cfssl_exec</field>
+        <field name="template_ids"
+               eval="[(4, [ref('image_template_cfssl_exec')])]"
+               />
+        <field name="parent_from">laslabs/clouder-cffsl-exec:latest</field>
+        <field name="volumes_from">data</field>
+    </record>
+    
+    <record id="image_openssl_exec" model="image">
+        <field name="name">image_openssl_exec</field>
+        <field name="template_ids"
+               eval="[(4, [ref('image_template_openssl_exec')])]"
+               />
+        <field name="parent_from">laslabs/clouder-openssl-exec:latest</field>
+    </record>
+
+</odoo>

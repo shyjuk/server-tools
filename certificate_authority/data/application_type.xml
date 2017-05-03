@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+
+    <record id="application_type_cfssl"
+            model="application.type"
+            >
+        <field name="name">cfssl</field>
+        <field name="system_user">root</field>
+        <field name="tag_ids"
+               eval="[(6, 0, [ref('tag_cert_authority')])]"
+               />
+    </record>
+    
+    <record id="application_type_openssl"
+            model="application.type"
+            >
+        <field name="name">openssl</field>
+        <field name="system_user">root</field>
+    </record>
+    
+</odoo>

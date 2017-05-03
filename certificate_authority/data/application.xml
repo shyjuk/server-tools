@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+
+    <record id="application_openssl_exec" model="application">
+        <field name="name">OpenSSL</field>
+        <field name="code">exec</field>
+        <field name="type_id" ref="application_type_openssl" />
+        <field name="tag_ids" eval="[(4, ref('tag_exec'))]" />
+        <field name="default_image_id" ref="image_openssl_exec" />
+        <field name="sequence">1</field>
+        <field name="required" eval="True"/>
+        <field name="update_strategy">auto</field>
+    </record>
+
+    <record id="application_cfssl_data" model="application">
+        <field name="name">CFSSL Data</field>
+        <field name="code">data</field>
+        <field name="type_id" ref="application_type_cfssl" />
+        <field name="tag_ids" eval="[(4, ref('tag_data'))]" />
+        <field name="default_image_id" ref="image_cfssl_data" />
+        <field name="sequence">1</field>
+        <field name="required" eval="True" />
+    </record>
+
+    <record id="application_cfssl_exec" model="application">
+        <field name="name">CFSSL Exec</field>
+        <field name="code">exec</field>
+        <field name="type_id" ref="application_type_cfssl" />
+        <field name="tag_ids" eval="[(4, ref('tag_exec'))]" />
+        <field name="default_image_id" ref="image_cfssl_exec" />
+        <field name="sequence">2</field>
+        <field name="required" eval="True" />
+        <field name="update_strategy">auto</field>
+        <field name="child_ids"
+               eval="[(4, ref('application_openssl_exec'))]"
+               />
+    </record>
+
+    <record id="application_cfssl" model="application">
+        <field name="name">CFSSL</field>
+        <field name="code">cfssl</field>
+        <field name="base" eval="True" />
+        <field name="sequence">1</field>
+        <field name="required" eval="True" />
+        <field name="type_id" ref="application_type_cfssl" />
+        <field name="tag_ids" eval="[(4, ref('tag_cert_authority'))]" />
+        <field name="child_ids"
+               eval="[(4, ref('application_cfssl_data')),
+                      (4, ref('application_cfssl_exec')),
+                     ]"
+               />
+        <field name="template_ids"
+               eval="[(4, ref('application_template_base_www'))]"
+               />
+    </record>
+
+</odoo>

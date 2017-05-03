@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+
+    <record id="cert_authority_scan_view_form" model="ir.ui.view">
+        <field name="name">Cert Authority Scan Form</field>
+        <field name="model">cert.authority.scan</field>
+        <field name="arch" type="xml">
+            <form string="Check a Host's TLS/SSL">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1>
+                        <field name="cert_authority_id" />
+                    </h1>
+                    <group>
+                        <field name="host_id"
+                               options="{'readonly': [('state', '!=', 'New')]}"
+                               />
+                        <field name="ip"
+                               options="{'readonly': [('state', '!=', 'New')]}"
+                               />
+                    </group>
+                    <group name="group_results">
+                        <field name="error" />
+                        <field name="results" />
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_scan"
+                            string="Scan"
+                            type="object"
+                            />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="cert_authority_scan_action" model="ir.actions.act_window">
+        <field name="name">Scan TLS/SSL Setup</field>
+        <field name="res_model">cert.authority</field>
+        <field name="src_model">cert.authority.scan</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="key2">client_action_multi</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

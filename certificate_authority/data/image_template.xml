@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+    
+    <record id="image_template_cfssl_data"
+            model="image.template"
+            >
+        <field name="name">image_template_cfssl_data</field>
+    </record>
+    
+    <record id="image_template_cfssl_exec"
+            model="image.template"
+            >
+        <field name="name">image_template_cfssl_exec</field>
+    </record>
+    
+    <record id="image_template_openssl_exec"
+            model="image.template"
+            >
+        <field name="name">image_template_openssl_exec</field>
+    </record>
+    
+</odoo>

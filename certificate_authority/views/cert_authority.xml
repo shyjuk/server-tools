@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 LasLabs Inc.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+
+<odoo>
+
+    <record id="cert_authority_view_tree" model="ir.ui.view">
+        <field name="name">Cert Authority Tree</field>
+        <field name="model">cert.authority</field>
+        <field name="arch" type="xml">
+            <tree string="Cert Authorities">
+                <field name="name" />
+                <field name="api_port_id" />
+                <field name="is_initialized" />
+                <field name="environment_id" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="cert_authority_view_form" model="ir.ui.view">
+        <field name="name">Cert Authority Form</field>
+        <field name="model">cert.authority</field>
+        <field name="arch" type="xml">
+            <form string="Cert Authority">
+                <header>
+                    <button name="cert_authority_scan_action"
+                            string="Scan Host"
+                            type="object"
+                            options="{'invisible': [('is_initialized', '=', True)]"
+                            context="{'default_cert_authority_id': id}"
+                            />
+                    <button name="cert_authority_sign_action"
+                            string="Sign Cert"
+                            type="object"
+                            options="{'invisible': [('is_initialized', '=', True)]"
+                            context="{'default_cert_authority_id': id}"
+                            />
+                    <button name="cert_authority_revoke_action"
+                            string="Revoke Cert"
+                            type="object"
+                            options="{'invisible': [('is_initialized', '=', True)]"
+                            context="{'default_cert_authority_id': id}"
+                            />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="buttons" />
+                    <group>
+                        <group>
+                            <field name="service_id" />
+                            <field name="config_id" />
+                        </group>
+                        <group>
+                            <field name="cert_request_id" />
+                            <field name="is_initialized" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="page_certs" string="Certs &amp; Keys">
+                            <group string="X.509">
+                                <field name="cert_ids"
+                                       nolabel="1"
+                                       />
+                            </group>
+                            <group string="Private">
+                                <field name="private_key_ids"
+                                       nolabel="1"
+                                       />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="cert_authority_view_search" model="ir.ui.view">
+        <field name="name">Cert Authority Search</field>
+        <field name="model">cert.authority</field>
+        <field name="arch" type="xml">
+            <search string="Cert Authorities">
+                <field name="service_id" />
+                <field name="environment_id" />
+                <filter string="Port"
+                        context="{'group_by': 'api_port_id'}"
+                        />
+                <filter string="Configuration"
+                        context="{'group_by': 'config_id'}"
+                        />
+                <filter string="Initialized"
+                        context="{'group_by': 'is_initialized'}"
+                        />
+            </search>
+        </field>
+    </record>
+
+    <record id="cert_authority_action" model="ir.actions.act_window">
+        <field name="name">Cert Authorities</field>
+        <field name="res_model">cert.authority</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

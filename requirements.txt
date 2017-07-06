@@ -3,6 +3,7 @@ unidecode
 acme_tiny
 IPy
 validate_email
+oauthlib
 pyotp
 pysftp
 fdb

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016 SYLEAM
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 import logging
 from odoo.tests.common import TransactionCase
@@ -14,10 +14,10 @@ except ImportError:
     _logger.debug('Cannot `import oauthlib`.')
 
 
-class TestOAuthProviderClient(TransactionCase):
+class TestOauthProviderClient(TransactionCase):
 
     def setUp(self):
-        super(TestOAuthProviderClient, self).setUp()
+        super(TestOauthProviderClient, self).setUp()
         self.client_vals = {
             'name': 'Client',
             'identifier': 'client',

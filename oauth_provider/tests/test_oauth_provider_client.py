@@ -14,10 +14,10 @@ except ImportError:
     _logger.debug('Cannot `import oauthlib`.')
 
 
-class TestOAuthProviderClient(TransactionCase):
+class TestOauthProviderClient(TransactionCase):
 
     def setUp(self):
-        super(TestOAuthProviderClient, self).setUp()
+        super(TestOauthProviderClient, self).setUp()
         self.client_vals = {
             'name': 'Client',
             'identifier': 'client',

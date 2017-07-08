@@ -5,7 +5,7 @@
 from odoo import models, fields
 
 
-class OAuthProviderRedirectURI(models.Model):
+class OauthProviderRedirectURI(models.Model):
     _name = 'oauth.provider.redirect.uri'
     _description = 'OAuth Provider Redirect URI'
 

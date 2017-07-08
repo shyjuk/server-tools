@@ -5,7 +5,7 @@
 from odoo import models, fields
 
 
-class OAuthProviderAuthorizationCode(models.Model):
+class OauthProviderAuthorizationCode(models.Model):
     _name = 'oauth.provider.authorization.code'
     _description = 'OAuth Provider Authorization Code'
     _rec_name = 'code'

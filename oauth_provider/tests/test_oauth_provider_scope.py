@@ -5,10 +5,10 @@
 from odoo.tests.common import TransactionCase
 
 
-class TestOAuthProviderScope(TransactionCase):
+class TestOauthProviderScope(TransactionCase):
 
     def setUp(self):
-        super(TestOAuthProviderScope, self).setUp()
+        super(TestOauthProviderScope, self).setUp()
         self.filter = self.env['ir.filters'].create({
             'name': 'Current user',
             'model_id': 'res.users',

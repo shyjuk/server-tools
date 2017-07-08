@@ -15,9 +15,9 @@ from odoo.tools.misc import consteq
 _logger = logging.getLogger(__name__)
 
 
-class OAuthProviderControllerTransactionCase(TransactionCase):
+class OauthProviderControllerTransactionCase(TransactionCase):
     def setUp(self, application_type):
-        super(OAuthProviderControllerTransactionCase, self).setUp()
+        super(OauthProviderControllerTransactionCase, self).setUp()
 
         # Initialize controller test stuff
         self.werkzeug_environ = {

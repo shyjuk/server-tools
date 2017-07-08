@@ -7,10 +7,10 @@ from odoo import fields, exceptions
 from odoo.tests.common import TransactionCase
 
 
-class TestOAuthProviderToken(TransactionCase):
+class TestOauthProviderToken(TransactionCase):
 
     def setUp(self):
-        super(TestOAuthProviderToken, self).setUp()
+        super(TestOauthProviderToken, self).setUp()
         self.client = self.env['oauth.provider.client'].create({
             'name': 'Client',
             'identifier': 'client',

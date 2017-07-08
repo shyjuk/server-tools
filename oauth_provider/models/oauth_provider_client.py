@@ -16,7 +16,7 @@ except ImportError:
     _logger.debug('Cannot `import oauthlib`.')
 
 
-class OAuthProviderClient(models.Model):
+class OauthProviderClient(models.Model):
     _name = 'oauth.provider.client'
     _description = 'OAuth Provider Client'
 

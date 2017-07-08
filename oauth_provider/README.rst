@@ -68,6 +68,9 @@ For example, to configure an Odoo's *auth_oauth* module compatible client, you w
 Usage
 =====
 
+Server
+------
+
 This module will allow OAuth clients to use your Odoo instance as an OAuth provider.
 
 Once configured, you must give these information to your client application :
@@ -82,7 +85,7 @@ Once configured, you must give these information to your client application :
      Parameters : access_token
   - User information request : http://odoo.example.com/oauth2/userinfo
      Parameters : access_token
-  - Any other model information request (depending on the scopes) : http://odoo.example.com/oauth2/otherinfo
+  - Any other model information request (depending on the scopes) : http://odoo.example.com/oauth2/data
      Parameters : access_token and model
 
 For example, to configure the *auth_oauth* Odoo module as a client, you will enter these values :
@@ -94,6 +97,7 @@ For example, to configure the *auth_oauth* Odoo module as a client, you will ent
 - Scope : A space separated list of scope codes allowed to the client in your Odoo Provider instance
 - Validation URL : http://odoo.example.com/oauth2/tokeninfo
 - Data URL : http://odoo.example.com/oauth2/userinfo
+
 
 .. image:: https://odoo-community.org/website/image/ir.attachment/5784_f2813bd/datas
    :alt: Try me on Runbot

@@ -5,7 +5,7 @@
 from odoo import models, api, fields, exceptions, _
 
 
-class OAuthProviderToken(models.Model):
+class OauthProviderToken(models.Model):
     _name = 'oauth.provider.token'
     _description = 'OAuth Provider Token'
     _rec_name = 'token'

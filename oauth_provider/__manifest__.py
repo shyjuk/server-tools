@@ -8,7 +8,7 @@
     'version': '10.0.1.0.0',
     'category': 'Authentication',
     'website': 'http://www.syleam.fr/',
-    'author': 'SYLEAM, Odoo Community Association (OCA)',
+    'author': 'SYLEAM, LasLabs, Odoo Community Association (OCA)',
     'license': 'AGPL-3',
     'installable': True,
     'external_dependancies': {

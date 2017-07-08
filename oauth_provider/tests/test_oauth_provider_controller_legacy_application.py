@@ -5,26 +5,26 @@
 import base64
 import json
 import logging
-from .common_test_controller import OAuthProviderControllerTransactionCase
+from .common_test_controller import OauthProviderControllerTransactionCase
 from .common_test_oauth_provider_controller import \
-    TestOAuthProviderRefreshTokenController, \
-    TestOAuthProviderTokeninfoController, \
-    TestOAuthProviderUserinfoController, \
-    TestOAuthProviderOtherinfoController, \
-    TestOAuthProviderRevokeTokenController
+    TestOauthProviderRefreshTokenController, \
+    TestOauthProviderTokeninfoController, \
+    TestOauthProviderUserinfoController, \
+    TestOauthProviderOtherinfoController, \
+    TestOauthProviderRevokeTokenController
 
 _logger = logging.getLogger(__name__)
 
 
-class TestOAuthProviderController(
-        OAuthProviderControllerTransactionCase,
-        TestOAuthProviderRefreshTokenController,
-        TestOAuthProviderTokeninfoController,
-        TestOAuthProviderUserinfoController,
-        TestOAuthProviderOtherinfoController,
-        TestOAuthProviderRevokeTokenController):
+class TestOauthProviderController(
+        OauthProviderControllerTransactionCase,
+        TestOauthProviderRefreshTokenController,
+        TestOauthProviderTokeninfoController,
+        TestOauthProviderUserinfoController,
+        TestOauthProviderOtherinfoController,
+        TestOauthProviderRevokeTokenController):
     def setUp(self):
-        super(TestOAuthProviderController, self).setUp('legacy application')
+        super(TestOauthProviderController, self).setUp('legacy application')
 
     def test_token_error_missing_arguments(self):
         """ Check /oauth2/token without any argument

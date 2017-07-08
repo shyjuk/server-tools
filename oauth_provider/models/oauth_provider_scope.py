@@ -10,7 +10,7 @@ from odoo import models, api, fields
 from odoo.tools.safe_eval import safe_eval
 
 
-class OAuthProviderScope(models.Model):
+class OauthProviderScope(models.Model):
     _name = 'oauth.provider.scope'
     _description = 'OAuth Provider Scope'
 

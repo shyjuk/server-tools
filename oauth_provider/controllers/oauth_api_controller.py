@@ -81,7 +81,6 @@ class OauthApiController(OauthMixin):
     @http.route('/oauth2/data',
                 type='json',
                 auth='none',
-                csrf=False,
                 methods=['POST'],
                 )
     def data_create(self, access_token, model, vals, *args, **kwargs):
@@ -94,11 +93,12 @@ class OauthApiController(OauthMixin):
     @http.route('/oauth2/data',
                 type='json',
                 auth='none',
-                csrf=False,
-                method=['PUT'],
+                methods=['PUT'],
                 )
     def data_write(self, access_token, model, record_ids, vals,
                    *args, **kwargs):
+        if isinstance(record_ids, int):
+            record_ids = [record_ids]
         token = self._validate_token(access_token)
         self._validate_model(model)
         record = token.write_record(model, record_ids, vals)
@@ -107,10 +107,11 @@ class OauthApiController(OauthMixin):
     @http.route('/oauth2/data',
                 type='json',
                 auth='none',
-                csrf=False,
-                method=['DELETE'],
+                methods=['DELETE'],
                 )
     def data_delete(self, access_token, model, record_ids, *args, **kwargs):
+        if isinstance(record_ids, int):
+            record_ids = [record_ids]
         token = self._validate_token(access_token)
         self._validate_model(model)
         token.delete_record(model, record_ids)

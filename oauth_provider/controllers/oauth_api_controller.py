@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016 SYLEAM
 # Copyright 2017 LasLabs Inc.
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 import logging
 
 from odoo import http, fields
 from odoo.addons.web.controllers.main import ensure_db
 
-from ..http import route
 from ..exceptions import OauthApiException, OauthInvalidTokenException
-from .oauth2_mixin import OauthMixin
+from .oauth_mixin import OauthMixin
 
 _logger = logging.getLogger(__name__)
 
@@ -55,12 +54,12 @@ class OauthApiController(OauthMixin):
             raise OauthInvalidTokenException()
         return token
 
-    @route('/oauth2/data',
-           type='oauth',
-           auth='none',
-           methods=['GET'],
-           )
-    def data_get(self, access_token=None, model=None, *args, **kwargs):
+    @http.route('/oauth2/data',
+                type='json',
+                auth='none',
+                methods=['GET'],
+                )
+    def data_read(self, access_token=None, model=None, *args, **kwargs):
         """ Return allowed information about the requested model.
 
         Args:
@@ -79,15 +78,15 @@ class OauthApiController(OauthMixin):
         )
         return self._json_response(data=data)
 
-    @route('/oauth2/data',
-           type='json',
-           auth='none',
-           csrf=False,
-           methods=['POST'],
-           )
-    def data_post(self, access_token=None, model=None, record_ids=None,
+    @http.route('/oauth2/data',
+                type='json',
+                auth='none',
+                csrf=False,
+                methods=['POST'],
+                )
+    def data_create(self, access_token=None, model=None, record_ids=None,
                   *args, **kwargs):
-        """ Update the records  """
+        """ Create and return new record.  """
         token = self._get_token(access_token)
         model = self._get_model(model)
-        raise OauthInvalidTokenException()
+        data = token.crea

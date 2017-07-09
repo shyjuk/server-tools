@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016 SYLEAM
 # Copyright 2017 LasLabs Inc.
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-import json
-import logging
 import werkzeug.wrappers
 
 from odoo import http
 from odoo.addons.web.controllers.main import ensure_db
 
-from ..http import OauthRequest
+from ..http import _json_response
 
-_logger = logging.getLogger(__name__)
 
 try:
     import oauthlib
@@ -85,4 +82,4 @@ class OauthMixin(http.Controller):
         Returns:
             BaseResponse: Werkzeug response object based on the input.
         """
-        return OauthRequest._json_response(data, headers=headers)
+        return _json_response(data, jsonrpc=False, headers=headers)

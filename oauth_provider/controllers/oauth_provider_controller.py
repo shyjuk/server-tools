@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016 SYLEAM
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 import json
 import logging
@@ -10,8 +10,7 @@ from datetime import datetime
 from odoo import http, fields
 from odoo.addons.web.controllers.main import ensure_db
 
-from ..http import route
-from .oauth2_mixin import OauthMixin
+from .oauth_mixin import OauthMixin
 
 _logger = logging.getLogger(__name__)
 
@@ -24,11 +23,11 @@ except ImportError:
 
 class OAuth2ProviderController(OauthMixin):
 
-    @route('/oauth2/authorize',
-           type='http',
-           auth='user',
-           methods=['GET'],
-           )
+    @http.route('/oauth2/authorize',
+                type='http',
+                auth='user',
+                methods=['GET'],
+                )
     def authorize(self, client_id=None, response_type=None, redirect_uri=None,
                   scope=None, state=None, *args, **kwargs):
         """ Check client's request, and display an authorization page to the user,
@@ -88,11 +87,11 @@ class OAuth2ProviderController(OauthMixin):
                 'oauth_scopes': oauth_scopes,
             })
 
-    @route('/oauth2/authorize',
-           type='http',
-           auth='user',
-           methods=['POST'],
-           )
+    @http.route('/oauth2/authorize',
+                type='http',
+                auth='user',
+                methods=['POST'],
+                )
     def authorize_post(self, *args, **kwargs):
         """ Redirect to the requested URI during the authorization """
         client = http.request.env['oauth.provider.client'].search([
@@ -116,12 +115,12 @@ class OAuth2ProviderController(OauthMixin):
 
         return werkzeug.utils.redirect(headers['Location'], code=status)
 
-    @route('/oauth2/token',
-           type='http',
-           auth='none',
-           methods=['POST'],
-           csrf=False,
-           )
+    @http.route('/oauth2/token',
+                type='http',
+                auth='none',
+                methods=['POST'],
+                csrf=False,
+                )
     def token(self, client_id=None, client_secret=None, redirect_uri=None,
               scope=None, code=None, grant_type=None, username=None,
               password=None, refresh_token=None, *args, **kwargs):
@@ -172,11 +171,11 @@ class OAuth2ProviderController(OauthMixin):
         return werkzeug.wrappers.BaseResponse(
             body, status=status, headers=headers)
 
-    @route('/oauth2/tokeninfo',
-           type='http',
-           auth='none',
-           methods=['GET'],
-           )
+    @http.route('/oauth2/tokeninfo',
+                type='http',
+                auth='none',
+                methods=['GET'],
+                )
     def tokeninfo(self, access_token=None, *args, **kwargs):
         """ Return some information about the supplied token
 
@@ -205,11 +204,11 @@ class OAuth2ProviderController(OauthMixin):
             data.update(user_id=token.generate_user_id())
         return self._json_response(data=data)
 
-    @route('/oauth2/userinfo',
-           type='http',
-           auth='none',
-           methods=['GET'],
-           )
+    @http.route('/oauth2/userinfo',
+                type='http',
+                auth='none',
+                methods=['GET'],
+                )
     def userinfo(self, access_token=None, *args, **kwargs):
         """ Return some information about the user linked to the supplied token
 
@@ -224,11 +223,11 @@ class OAuth2ProviderController(OauthMixin):
         data = token.get_data_for_model('res.users', res_id=token.user_id.id)
         return self._json_response(data=data)
 
-    @route('/oauth2/otherinfo',
-           type='http',
-           auth='none',
-           methods=['GET'],
-           )
+    @http.route('/oauth2/otherinfo',
+                type='http',
+                auth='none',
+                methods=['GET'],
+                )
     def otherinfo(self, access_token=None, model=None, *args, **kwargs):
         """ Return allowed information about the requested model """
         ensure_db()
@@ -247,11 +246,11 @@ class OAuth2ProviderController(OauthMixin):
         data = token.get_data_for_model(model)
         return self._json_response(data=data)
 
-    @route('/oauth2/revoke_token',
-           type='http',
-           auth='none',
-           methods=['POST'],
-           )
+    @http.route('/oauth2/revoke_token',
+                type='http',
+                auth='none',
+                methods=['POST'],
+                )
     def revoke_token(self, token=None, *args, **kwargs):
         """ Revoke the supplied token """
         ensure_db()

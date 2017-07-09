@@ -1,138 +1,112 @@
 # -*- coding: utf-8 -*-
 # Copyright 2017 LasLabs Inc.
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 import functools
+import json
+
 import werkzeug.wrappers
 
 from odoo import http
 
 
-def _oauth_route(route, **kw):
-    routing = kw.copy()
-
-    def decorator(f):
-        if route:
-            if isinstance(route, list):
-                routes = route
-            else:
-                routes = [route]
-            routing['routes'] = routes
-
-        @functools.wraps(f)
-        def response_wrap(*args, **kw):
-            response = f(*args, **kw)
-            return response
-
-        response_wrap.routing = routing
-        response_wrap.original_func = f
-        return response_wrap
-
-    return decorator
+VERSION = "1.0"
 
 
-def route(route=None, **kw):
-    """ Route method allowing for OAuth request type handling. """
-    try:
-        if routing['type'] == 'oauth':
-            return _oauth_route(route, **kw)
-    except KeyError:
-        pass
-    return http.route(route, **kw)
+old_handle_exception = http.JsonRequest._handle_exception
+old_json_response = http.JsonRequest._json_response
 
 
-class OauthRequest(http.JsonRequest):
-    """ Request handler for Oauth JSON API.
+def _handle_exception(self, exception):
+    """ Override the original method to handle Werkzeug exceptions.
 
-    Successful Response::
+    Args:
+        exception (Exception): Exception object that is being thrown.
 
-        {
-            "version": "1.0",
-            "status": 200,
-            "result": { "key1": "val1", ... },
-            "error": None,
-        }
-
-    Error Response::
-
-        {
-            "version": "1.0",
-            "status": 500,
-            "result": None,
-            "error": {
-                "code": 500,
-                "message": "Canonical error message",
-                "data": {
-                    "debug": "Traceback (most recent call last)...",
-                    "exception_type": "exception_code",
-                    "message": "Canonical error message"<
-                    "name": "werkzeug.exceptions.NotFound",
-                    "arguments": [],
-                },
-            }
-        }
+    Returns:
+        BaseResponse: JSON Response.
     """
-
-    VERSION = "1.0"
-    _request_type = 'oauth'
-
-    @classmethod
-    def _json_response(cls, result=None, error=None, headers=None):
-        """ Returns a JSON response to the OAuth client.
-
-        Args:
-            result (mixed, optional): User's requested data.
-            error (dict, optional): Serialized error data (from
-                `_handle_exception`).
-            headers (dict, optional): Mapping of headers to apply to the
-                request. If the `Content-Type` header is not defined,
-                 `application/json` will automatically be added.
-
-        Returns:
-            BaseResponse: Werkzeug response object based on the input.
-        """
-
-        if headers is None:
-            headers = {}
-
-        response = {
-            'version': cls.VERSION,
-            'result': result,
-            'error': error,
-        }
-
-        try:
-            response['status'] = error['code']
-        except (TypeError, KeyError):
-            response['status'] = 200
-
-        if 'Content-Type' not in headers:
-            headers['Content-Type'] = 'application/json'
-
-        body = json.dumps(response)
-        headers['Content-Length'] = len(body)
-
-        return werkzeug.wrappers.BaseResponse(
-            body, status=status, headers=headers,
+    try:
+        code = exception.code
+    except AttributeError:
+        return old_handle_exception(
+            self, exception,
         )
 
-    @classmethod
-    def _handle_exception(cls, exception):
-        """Called within an except block to allow converting exceptions
-           to arbitrary responses. Anything returned (except None) will
-           be used as response."""
-        error = {
-            'data': serialize_exception(exception),
+    error = {
+        'data': http.serialize_exception(exception),
+        'code': code,
+    }
+
+    try:
+        error['message'] = exception.message
+    except AttributeError:
+        error['message'] = 'Internal Server Error'
+
+    return self._json_response(error=error)
+
+def _json_response(self, result=None, error=None, jsonrpc=True,
+                   headers=None):
+    """ Returns a JSON response to the OAuth client.
+
+    If `jsonrpc` is set to `True`, this method will provide default Odoo
+    functionality.
+
+    If `jsonrp` is set to `False`, this method will return a JSON response
+    that is more appropriate for non RPC ingestion. The response will be
+    provided under a proper HTTP status code, and will be in the following
+    format::
+
+        {
+            "version": str,
+            "status_code": int,
+            "result": dict,
+            "error": dict,
         }
 
-        try:
-            error['code'] = exception.code
-        except AttributeError:
-            error['code'] = 500
+    Args:
+        result (mixed, optional): User's requested data.
+        error (dict, optional): Serialized error data (from
+            `_handle_exception`).
+        jsonrpc (bool, optional): Set to False in order to respond without
+            JSON-RPC, and instead send a simple JSON response.
+        headers (dict, optional): Mapping of headers to apply to the
+            request. If the `Content-Type` header is not defined,
+             `application/json` will automatically be added.
 
-        try:
-            error['message'] = exception.message
-        except AttributeError:
-            error['message'] = 'Internal Server Error'
+    Returns:
+        BaseResponse: Werkzeug response object based on the input.
+    """
 
-        return cls._json_response(error=error)
+    if jsonrpc and not self.env.context.get('oauth_api'):
+        return old_json_response(
+            self, result, error,
+        )
+
+    if headers is None:
+        headers = {}
+
+    response = {
+        'version': VERSION,
+        'result': result,
+        'error': error,
+    }
+
+    try:
+        response['status_code'] = error['code']
+    except (TypeError, KeyError):
+        response['status_code'] = 200
+
+    if 'Content-Type' not in headers:
+        headers['Content-Type'] = 'application/json'
+
+    body = json.dumps(response)
+    headers['Content-Length'] = len(body)
+
+    return werkzeug.wrappers.BaseResponse(
+        body, status=response['status_code'], headers=headers,
+    )
+
+
+http.JsonRequest._json_response = _json_response
+http.JsonRequest._handle_exception = _handle_exception

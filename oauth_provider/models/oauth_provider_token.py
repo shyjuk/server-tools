@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016 SYLEAM
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 from odoo import models, api, fields, exceptions, _
 
@@ -114,7 +114,23 @@ class OauthProviderToken(models.Model):
         If the all_scopes_match argument is set to True, return only records
         allowed by all token's scopes
         """
-        # Retrieve records allowed from all scopes
         return self.user_scopes.get_data(
             model, res_id=res_id, all_scopes_match=all_scopes_match,
         )
+
+    @api.multi
+    def create_record(self, model, vals):
+        return self.user_scopes.create_record(model, vals)
+
+    @api.multi
+    def write_record(self, model, record_ids, vals):
+        scopes = self.user_scopes
+        records = scopes.env[model].browse(record_ids)
+        return user_scopes.write_record(records, vals)
+
+    @api.multi
+    def delete_record(self, model, record_ids):
+        scopes = self.user_scopes
+        records = scopes.env[model].browse(record_ids)
+        return user_scopes.delete_record(records)
+

@@ -59,7 +59,7 @@ class OauthApiController(OauthMixin):
                 auth='none',
                 methods=['GET'],
                 )
-    def data_read(self, access_token=None, model=None, *args, **kwargs):
+    def data_read(self, access_token, model, *args, **kwargs):
         """ Return allowed information about the requested model.
 
         Args:
@@ -84,9 +84,37 @@ class OauthApiController(OauthMixin):
                 csrf=False,
                 methods=['POST'],
                 )
-    def data_create(self, access_token=None, model=None, record_ids=None,
-                  *args, **kwargs):
+    def data_create(self, access_token, model, vals, *args, **kwargs):
         """ Create and return new record.  """
         token = self._get_token(access_token)
         model = self._get_model(model)
-        data = token.crea
+        return self._json_response(
+            data=token.create_record(model, vals),
+        )
+
+    @http.route('/oauth2/data',
+                type='json',
+                auth='none',
+                csrf=False,
+                method=['PUT'],
+                )
+    def data_write(self, access_token, model, record_ids, vals,
+                   *args, **kwargs):
+        token = self._get_token(access_token)
+        model = self._get_model(model)
+        return self._json_response(
+            data=token.write_record(model, record_ids, vals),
+        )
+
+    @http.route('/oauth2/data',
+                type='json',
+                auth='none',
+                csrf=False,
+                method=['DELETE'],
+                )
+    def data_delete(self, access_token, model, record_ids, *args, **kwargs):
+        token = self._get_token(access_token)
+        model = self._get_model(model)
+        return self._json_response(
+            data=token.delete_record(model, record_ids),
+        )

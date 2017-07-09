@@ -125,12 +125,14 @@ class OauthProviderToken(models.Model):
     @api.multi
     def write_record(self, model, record_ids, vals):
         scopes = self.user_scopes
+        # Browse using the scope env, which is in the token's user
         records = scopes.env[model].browse(record_ids)
         return user_scopes.write_record(records, vals)
 
     @api.multi
     def delete_record(self, model, record_ids):
         scopes = self.user_scopes
+        # Browse using the scope env, which is in the token's user
         records = scopes.env[model].browse(record_ids)
         return user_scopes.delete_record(records)
 

@@ -39,6 +39,12 @@ class OauthProviderToken(models.Model):
          'The refresh token must be unique per client !'),
     ]
 
+    @property
+    @api.multi
+    def user_scopes(self):
+        self.ensure_one()
+        return self.sudo(user=self.user_id).scope_ids
+
     @api.multi
     def _compute_active(self):
         for token in self:
@@ -85,15 +91,30 @@ class OauthProviderToken(models.Model):
         return self.client_id.generate_user_id(self.user_id)
 
     @api.multi
-    def get_data_for_model(self, model, res_id=None, all_scopes_match=False):
+    def get_data(self, model, res_id=None, all_scopes_match=False,
+                 domain=None):
         """ Returns the data of the accessible records of the requested model,
+
+        Args:
+            model (str): Name of the model to operate on.
+            res_id (int): ID of record to find. Will only return this record,
+                if defined.
+            all_scopes_match (bool): True to filter out records that do not
+                match all of the scopes in the current recordset.
+            domain (list of tuples, optional): Domain to append to the
+                `filter_domain` that is defined in the scope.
+
+        Returns:
+            dict: If `res_id` is defined, this will be the scoped data for the
+                appropriate record (or empty dict if no match). Otherwise,
+                this will be a dictionary of scoped record data, keyed by
+                record ID.
 
         Data are returned depending on the allowed scopes for the token
         If the all_scopes_match argument is set to True, return only records
         allowed by all token's scopes
         """
-        self.ensure_one()
-
         # Retrieve records allowed from all scopes
-        return self.sudo(user=self.user_id).scope_ids.get_data_for_model(
-            model, res_id=res_id, all_scopes_match=all_scopes_match)
+        return self.user_scopes.get_data(
+            model, res_id=res_id, all_scopes_match=all_scopes_match,
+        )

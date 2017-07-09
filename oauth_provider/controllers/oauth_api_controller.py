@@ -68,20 +68,19 @@ class OauthApiController(OauthMixin):
                 operation.
             model (str): Name of model to operate on.
             domain (list, optional): Domain to apply to the search, in the
-                standard Odoo format. This only applies if there is not
-                already a filter on the token scope. Otherwise, the scope
-                will take precedence.
+                standard Odoo format. This will be appended to the scope's
+                pre-existing filter.
         """
         token = self._get_token(access_token)
         model = self._get_model(model)
-        data = token.get_data_for_model(
+        data = token.get_data(
             model,
             domain=kwargs.get('domain', []),
         )
         return self._json_response(data=data)
 
     @route('/oauth2/data',
-           type='oauth',
+           type='json',
            auth='none',
            csrf=False,
            methods=['POST'],

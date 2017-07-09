@@ -20,6 +20,44 @@ except ImportError:
 
 class OauthMixin(http.Controller):
 
+    def _validate_model(self, model_name):
+        """ Validate the access token & return a usable model.
+
+        Args:
+            model_name (str): Name of model to find.
+
+        Returns:
+            IrModel: Usable model object that matched model_name.
+
+        Raises:
+            OauthApiException: If the model is not found.
+        """
+        ensure_db()
+        model_obj = http.request.env['ir.model'].search([
+            ('model', '=', model_name),
+        ])
+        if not model_obj:
+            raise OauthApiException('Model Not Found')
+        return model_obj
+
+    def _validate_token(self, access_token):
+        """ Find the access token & return it if valid.
+
+        Args:
+            access_token (str): Access token that should be validated.
+
+        Returns:
+            OAuthProviderToken: Token record, if valid.
+
+        Raises:
+            OauthInvalidTokenException: When the token is invalid or expired.
+        """
+        ensure_db()
+        token = self._get_access_token(access_token)
+        if not token:
+            raise OauthInvalidTokenException()
+        return token
+
     @classmethod
     def _get_access_token(cls, access_token):
         """ Verify access token and return record if valid.

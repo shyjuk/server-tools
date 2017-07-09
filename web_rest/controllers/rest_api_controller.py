@@ -1,28 +1,34 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016 SYLEAM
 # Copyright 2017 LasLabs Inc.
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 import logging
 
-from odoo import http, fields
-from odoo.addons.web.controllers.main import ensure_db
+from odoo import http
 
-from ..exceptions import OauthApiException, OauthInvalidTokenException
-from .oauth_mixin import OauthMixin
+from ..exceptions import RestApiException
 
 _logger = logging.getLogger(__name__)
 
+try:
+    from odoo.addons.oauth_provider.controllers.oauth_mixin import OauthMixin
+except ImportError:
+    _logger.warning('The `oauth_provider` module is not present in your '
+                    'addons directory.')
 
-class OauthApiController(OauthMixin):
 
-    @http.route('/oauth2/data',
-                type='json',
-                auth='none',
-                methods=['GET'],
-                )
-    def data_read(self, access_token, model, domain=None, *args, **kwargs):
-        """ Return allowed information about the requested model.
+class RestApiController(OauthMixin):
+
+    API_VERSION = '1.0'
+
+    @http.route(
+        '/web_rest/%s/<string:model>/' % API_VERSION,
+        type='json',
+        auth='none',
+        methods=['GET', 'POST'],
+    )
+    def rest_search(self, access_token, model, domain=None, *a, **kw):
+        """ Return allowed information from all records, with optional query.
 
         Args:
             access_token (str): OAuth2 access token to utilize for the
@@ -37,12 +43,33 @@ class OauthApiController(OauthMixin):
         data = token.get_data(model, domain=domain)
         return data
 
-    @http.route('/oauth2/data',
-                type='json',
-                auth='none',
-                methods=['POST'],
-                )
-    def data_create(self, access_token, model, vals, *args, **kwargs):
+    @http.route(
+        '/web_rest/%s/<string:model>/<int:rec_id>' % API_VERSION,
+        type='json',
+        auth='none',
+        methods=['GET'],
+    )
+    def rest_read(self, access_token, model, record_ids, *a, **kw):
+        """ Return allowed information from specific records.
+
+        Args:
+            access_token (str): OAuth2 access token to utilize for the
+                operation.
+            model (str): Name of model to operate on.
+            record_ids (int or list of ints): ID of record(s) to get.
+        """
+        token = self._validate_token(access_token)
+        self._validate_model(model)
+        data = token.get_data(model, rec_id)
+        return data
+
+    @http.route(
+        '/web_rest/%s/<string:model>/' % API_VERSION,
+        type='json',
+        auth='none',
+        methods=['POST'],
+    )
+    def rest_create(self, access_token, model, vals, *args, **kwargs):
         """ Create and return new record. """
         token = self._validate_token(access_token)
         self._validate_model(model)

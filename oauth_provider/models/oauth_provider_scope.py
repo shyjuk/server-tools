@@ -62,29 +62,32 @@ class OauthProviderScope(models.Model):
         """ Return the current scopes that are associated to the model.
 
         Args:
-            model (str): Name of the model to operate on.
+            model (str or BaseModel): Name or object of the model to operate
+                on.
 
         Returns:
             OauthProviderScope: Recordsets associated to the model.
         """
+        if isinstance(model, models.BaseModel):
+            model = model._name
         return self.filtered(lambda record: record.model == model)
 
     @api.multi
-    def get_data(self, model, res_id=None, all_scopes_match=False,
+    def get_data(self, model_name, record_id=None, all_scopes_match=False,
                  domain=None):
         """ Return the data matching the scopes from the requested model.
 
         Args:
-            model (str): Name of the model to operate on.
-            res_id (int): ID of record to find. Will only return this record,
-                if defined.
+            model_name (str): Name of the model to operate on.
+            record_id (int): ID of record to find. Will only return this
+                record, if defined.
             all_scopes_match (bool): True to filter out records that do not
                 match all of the scopes in the current recordset.
             domain (list of tuples, optional): Domain to append to the
                 `filter_domain` that is defined in the scope.
 
         Returns:
-            dict: If `res_id` is defined, this will be the scoped data for the
+            dict: If `record_id` is defined, this will be the scoped data for the
                 appropriate record (or empty dict if no match). Otherwise,
                 this will be a dictionary of scoped record data, keyed by
                 record ID.
@@ -92,11 +95,11 @@ class OauthProviderScope(models.Model):
 
         data = defaultdict(dict)
         eval_context = self.ir_filter_eval_context
-        all_scopes_records = self.env[model]
+        all_scopes_records = self.env[model_name]
 
-        for scope in self.filter_by_model(model):
+        for scope in self.filter_by_model(model_name):
 
-            records = scope._get_scoped_records(eval_context, domain)
+            records = scope._get_scoped_records(eval_context, domain, record_id)
 
             for record_data in records.read(scope.field_ids.mapped('name')):
                 for field, value in record_data.items():
@@ -122,17 +125,17 @@ class OauthProviderScope(models.Model):
                 ),
             )
 
-        if res_id is not None:
-            data = data.get(res_id, {})
+        if record_id is not None:
+            data = data.get(record_id, {})
 
         return data
 
     @api.multi
-    def create_record(self, model, vals):
+    def create_record(self, model_name, vals):
         """ Create a record, validate the scope, and return (if valid).
 
         Args:
-            model (str): Name of the model to operate on.
+            model_name (str): Name of the model to operate on.
             vals (dict): Values to create record with, keyed by field name.
 
         Returns:
@@ -143,32 +146,32 @@ class OauthProviderScope(models.Model):
                 but are not within the current scope.
         """
         
-        if not self._validate_scope_field(model, vals):
+        if not self._validate_scope_field(model_name, vals):
             raise OauthScopeValidationException('field')
 
-        record = self.env[model].create(vals)
+        record = self.env[model_name].create(vals)
 
         if not self._validate_scope_record(record):
             raise OauthScopeValidationException('record')
 
         return record
 
-    def get_record(self, model, domain=None):
+    def get_record(self, model_name, domain=None):
         """ Get the currently scoped records, adhering to optional domain.
 
         Args:
-            model (str): Model to search.
+            model_name (str): Model to search.
             domain (list of tuples, optional): Additional domain to add to the
                 currently scoped filter.
 
         Returns:
-            models.Model: Recordsets.
+            BaseModel: Recordsets.
         """
-        records = self.env[model]
+        records = self.env[model_name]
         eval_context = self.ir_filter_eval_context
-        for scope in self.filter_by_model(model):
+        for scope in self.filter_by_model(model_name):
             records += scope._get_scoped_records(
-                model, eval_context, domain,
+                model_name, eval_context, domain,
             )
         return records
 
@@ -177,7 +180,7 @@ class OauthProviderScope(models.Model):
         """ Write to a recordset, adhering to the current scope.
 
         Args:
-            records (models.Model): Recordset to write to.
+            records (BaseModel): Recordset to write to.
             vals (dict): Values to modify records with, keyed by field name.
 
         Returns:
@@ -210,7 +213,7 @@ class OauthProviderScope(models.Model):
         """ Delete a recordset that is within the current scope.
 
         Args:
-            records (models.Model): Recordset to delete.
+            records (BaseModel): Recordset to delete.
 
         Raises:
             OauthScopeValidationException: If records are not within the
@@ -223,12 +226,13 @@ class OauthProviderScope(models.Model):
         records.unlink()
 
     @api.multi
-    def _get_filter_domain(self, eval_context):
+    def _get_filter_domain(self, eval_context, record_id=None):
         """ Return the scope's domain.
 
         Args:
             eval_context (dict): Base eval context, such as provided by
                 `ir_filter_eval_context`
+            record_id (int): ID of record to explicitly query.
 
         Returns:
             list of tuples: Domain of the scope, in standard Odoo format.
@@ -240,40 +244,43 @@ class OauthProviderScope(models.Model):
                 self.filter_id.sudo().domain,
                 eval_context,
             )
-        if res_id is not None:
+        if record_id is not None:
             filter_domain.append(
-                ('id', '=', res_id),
+                ('id', '=', record_id),
             )
         return filter_domain
 
     @api.multi
-    def _get_scoped_records(self, model, eval_context=None, add_domain=None):
+    def _get_scoped_records(self, model, eval_context=None, add_domain=None,
+                            record_id=None):
         """ Return records that are within the scopes in the recordset.
 
         Args:
-            model (str): Name of the model to operate on.
+            model (BaseModel): Name of the model to operate on.
             eval_context (dict, optional): Base eval context, such as provided
                 by `ir_filter_eval_context`.
             add_domain (list of tuples, optional): Domain to append to the
                 `filter_domain` that is defined in the scope.
+            record_id (int): ID of record to find. Will only return this
+                record, if defined.
 
         Returns:
-            models.Model: Recordset matching the scope.
+            BaseModel: Recordset matching the scope.
         """
         self.ensure_one()
         if eval_context is None:
             eval_context = self.ir_filter_eval_context
         if add_domain is None:
             add_domain = []
-        filter_domain = self._get_filter_domain(eval_context)
-        return self.env[model].search(filter_domain + add_domain)
+        filter_domain = self._get_filter_domain(eval_context, record_id)
+        return model.search(filter_domain + add_domain)
 
     @api.multi
     def _validate_scope_record(self, records):
         """ Validate that the recordset is within the current scope.
 
         Args:
-            records (models.Model): Recordset to validate.
+            records (BaseModel): Recordset to validate.
 
         Returns:
             bool: Indicating whether the records are within scope.
@@ -283,15 +290,18 @@ class OauthProviderScope(models.Model):
             self.env[records._name],
         )
         return all([
-            r.id in scoped_records for r in records
+            r in scoped_records for r in records
         ])
 
     @api.multi
     def _validate_scope_field(self, model, vals):
         """ Validate that the input vals do not violate the current scope.
 
+        If there are no fields defined in the scope, all fields are assumed to
+        be permitted.
+
         Args:
-            model (str): Name of the model to operate on.
+            model (BaseModel): Name of the model to operate on.
             vals (dict): Values that should be checked against the current
                 scope, keyed by field name.
 
@@ -300,6 +310,8 @@ class OauthProviderScope(models.Model):
         """
         scopes = self.filter_by_model(model)
         field_names = scopes.field_ids.mapped('name')
+        if not field_names:
+            return True
         return all([
             f in field_names for f in vals.keys()
         ])

@@ -8,7 +8,7 @@ import werkzeug.wrappers
 from odoo import http
 from odoo.addons.web.controllers.main import ensure_db
 
-from ..http import _json_response
+#from ..http import _json_response
 
 
 try:
@@ -82,4 +82,4 @@ class OauthMixin(http.Controller):
         Returns:
             BaseResponse: Werkzeug response object based on the input.
         """
-        return _json_response(data, jsonrpc=False, headers=headers)
+        return http.request._json_response(data)

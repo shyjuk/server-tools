@@ -5,8 +5,6 @@
 import functools
 import json
 
-import werkzeug.wrappers
-
 from odoo import http
 
 
@@ -76,7 +74,7 @@ def _json_response(self, result=None, error=None, jsonrpc=True,
              `application/json` will automatically be added.
 
     Returns:
-        BaseResponse: Werkzeug response object based on the input.
+        Response: Werkzeug response object based on the input.
     """
 
     if jsonrpc and not self.env.context.get('oauth_api'):
@@ -104,10 +102,10 @@ def _json_response(self, result=None, error=None, jsonrpc=True,
     body = json.dumps(response)
     headers['Content-Length'] = len(body)
 
-    return werkzeug.wrappers.BaseResponse(
+    return http.Response(
         body, status=response['status_code'], headers=headers,
     )
 
 
-http.JsonRequest._json_response = _json_response
+# http.JsonRequest._json_response = _json_response
 http.JsonRequest._handle_exception = _handle_exception

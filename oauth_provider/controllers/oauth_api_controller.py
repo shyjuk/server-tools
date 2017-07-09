@@ -16,7 +16,7 @@ _logger = logging.getLogger(__name__)
 
 class OauthApiController(OauthMixin):
 
-    def _get_model(self, model_name):
+    def _validate_model(self, model_name):
         """ Validate the access token & return a usable model.
 
         Args:
@@ -36,7 +36,7 @@ class OauthApiController(OauthMixin):
             raise OauthApiException('Model Not Found')
         return model_obj
 
-    def _get_token(self, access_token):
+    def _validate_token(self, access_token):
         """ Find the access token & return it if valid.
 
         Args:
@@ -70,13 +70,13 @@ class OauthApiController(OauthMixin):
                 standard Odoo format. This will be appended to the scope's
                 pre-existing filter.
         """
-        token = self._get_token(access_token)
-        model = self._get_model(model)
+        token = self._validate_token(access_token)
+        self._validate_model(model)
         data = token.get_data(
             model,
             domain=kwargs.get('domain', []),
         )
-        return self._json_response(data=data, jsonrpc=False)
+        return data
 
     @http.route('/oauth2/data',
                 type='json',
@@ -86,12 +86,10 @@ class OauthApiController(OauthMixin):
                 )
     def data_create(self, access_token, model, vals, *args, **kwargs):
         """ Create and return new record. """
-        token = self._get_token(access_token)
-        model = self._get_model(model)
-        return self._json_response(
-            data=token.create_record(model, vals),
-            jsonrpc=False,
-        )
+        token = self._validate_token(access_token)
+        self._validate_model(model)
+        record = token.create_record(model, vals)
+        return record.read()
 
     @http.route('/oauth2/data',
                 type='json',
@@ -101,12 +99,10 @@ class OauthApiController(OauthMixin):
                 )
     def data_write(self, access_token, model, record_ids, vals,
                    *args, **kwargs):
-        token = self._get_token(access_token)
-        model = self._get_model(model)
-        return self._json_response(
-            data=token.write_record(model, record_ids, vals),
-            jsonrpc=False,
-        )
+        token = self._validate_token(access_token)
+        self._validate_model(model)
+        record = token.write_record(model, record_ids, vals)
+        return record.read()
 
     @http.route('/oauth2/data',
                 type='json',
@@ -115,9 +111,7 @@ class OauthApiController(OauthMixin):
                 method=['DELETE'],
                 )
     def data_delete(self, access_token, model, record_ids, *args, **kwargs):
-        token = self._get_token(access_token)
-        model = self._get_model(model)
-        return self._json_response(
-            data=token.delete_record(model, record_ids),
-            jsonrpc=False,
-        )
+        token = self._validate_token(access_token)
+        self._validate_model(model)
+        token.delete_record(model, record_ids)
+        return True

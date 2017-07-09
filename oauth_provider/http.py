@@ -26,9 +26,10 @@ def _handle_exception(self, exception):
     Returns:
         BaseResponse: JSON Response.
     """
-    try:
-        code = exception.code
-    except AttributeError:
+
+    # For some reason a try/except here still raised...
+    code = getattr(exception, 'code', None)
+    if code is None:
         return old_handle_exception(
             self, exception,
         )

@@ -76,7 +76,7 @@ class OauthApiController(OauthMixin):
             model,
             domain=kwargs.get('domain', []),
         )
-        return self._json_response(data=data)
+        return self._json_response(data=data, jsonrpc=False)
 
     @http.route('/oauth2/data',
                 type='json',
@@ -85,11 +85,12 @@ class OauthApiController(OauthMixin):
                 methods=['POST'],
                 )
     def data_create(self, access_token, model, vals, *args, **kwargs):
-        """ Create and return new record.  """
+        """ Create and return new record. """
         token = self._get_token(access_token)
         model = self._get_model(model)
         return self._json_response(
             data=token.create_record(model, vals),
+            jsonrpc=False,
         )
 
     @http.route('/oauth2/data',
@@ -104,6 +105,7 @@ class OauthApiController(OauthMixin):
         model = self._get_model(model)
         return self._json_response(
             data=token.write_record(model, record_ids, vals),
+            jsonrpc=False,
         )
 
     @http.route('/oauth2/data',
@@ -117,4 +119,5 @@ class OauthApiController(OauthMixin):
         model = self._get_model(model)
         return self._json_response(
             data=token.delete_record(model, record_ids),
+            jsonrpc=False,
         )

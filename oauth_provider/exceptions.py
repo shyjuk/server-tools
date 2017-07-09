@@ -27,5 +27,5 @@ class OauthScopeValidationException(exceptions.Forbidden):
             'There was an error validating the attempted action against '
             'your session\'s authorized scope. The error code is: %s',
         )
-        super(OauthInvalidTokenException, self).__init__(msg % code)
+        super(OauthScopeValidationException, self).__init__(msg % code)
         self.traceback = ('', '', '')

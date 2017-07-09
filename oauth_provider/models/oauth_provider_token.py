@@ -93,7 +93,7 @@ class OauthProviderToken(models.Model):
     @api.multi
     def get_data(self, model, res_id=None, all_scopes_match=False,
                  domain=None):
-        """ Returns the data of the accessible records of the requested model,
+        """ Returns the data of the accessible records of the requested model.
 
         Args:
             model (str): Name of the model to operate on.

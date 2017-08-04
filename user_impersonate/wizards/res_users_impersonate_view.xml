@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Copyright 2016 LasLabs Inc.
+    License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+-->
+
+<odoo>
+
+    <record id="res_users_impersonate_form" model="ir.ui.view">
+        <field name="model">res.users.impersonate</field>
+        <field name="arch" type="xml">
+            <form string="User Impersonation">
+                <sheet>
+                    <group>
+                        <field name="to_user_id" />
+                    </group>
+                </sheet>
+                <footer>
+                    <button type="object"
+                            string="Impersonate"
+                            name="action_impersonate" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="res_users_impersonate_action" model="ir.actions.act_window">
+        <field name="name">Impersonate User</field>
+        <field name="res_model">res.users.impersonate</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="res_users_impersonate_form" />
+    </record>
+
+    <menuitem id="res_users_impersonate_menu"
+              action="res_users_impersonate_action"
+              parent="base.menu_security" />
+
+</odoo>

@@ -4,7 +4,7 @@
 
 import operator
 
-from odoo import http
+from odoo import http, SUPERUSER_ID
 from odoo.http import request
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 from odoo.addons.web.controllers.main import ensure_db, Session
@@ -35,7 +35,6 @@ class PasswordSecurityHome(AuthSignupHome):
     @http.route()
     def web_login(self, *args, **kw):
         ensure_db()
-        old_uid = request.uid
         response = super(PasswordSecurityHome, self).web_login(*args, **kw)
         if not request.httprequest.method == 'POST':
             return response
@@ -45,7 +44,8 @@ class PasswordSecurityHome(AuthSignupHome):
             request.params['password']
         )
         if not uid:
-            request.uid = old_uid
+            # An intermediary uid is required to allow for lookup by reference
+            request.uid = SUPERUSER_ID
             request.uid = request.env.ref('base.public_user').id
             return response
         users_obj = request.env['res.users'].sudo()

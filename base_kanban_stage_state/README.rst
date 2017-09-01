@@ -7,21 +7,24 @@ Base Kanban Stage State
 =======================
 
 This module extends the functionality of base_kanban_stage to allow you to
-map stages from base_kanban_stage to states. The states are:
+map stages from base_kanban_stage to the following states:
 
-*. New (draft)
-*. In Progress (open)
-*. Pending (pending)
-*. Done (done)
-*. Cancelled (cancelled)
-*. Exception (exception)
+* New (draft)
+* In Progress (open)
+* Pending (pending)
+* Done (done)
+* Cancelled (cancelled)
+* Exception (exception)
+
+Mapping a stage to a state will link the two in the model implementing Kanban,
+if that model has a `state` field and that field with defined state as an option.
 
 Usage
 =====
 
-To use this module, you need to:
-
-#. Go to ...
+* Navigate to Settings > Technical > Kanban > Stages
+* Chose a stage
+* Assign it to a state
 
 .. image:: https://odoo-community.org/website/image/ir.attachment/5784_f2813bd/datas
    :alt: Try me on Runbot
@@ -50,6 +53,7 @@ Contributors
 ------------
 
 * Kelly Lougheed <kelly@smdrugstore.com>
+* Dave Lasley <dave@laslabs.com>
 
 Maintainer
 ----------

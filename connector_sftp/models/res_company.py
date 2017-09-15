@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# © 2016-TODAY LasLabs Inc.
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# Copyright 2016-2017 LasLabs Inc.
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
-from openerp import models, fields
+from odoo import fields, models
 
 
 class ResCompany(models.Model):

@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
-# © 2016-TODAY LasLabs Inc.
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# Copyright 2016-2017 LasLabs Inc.
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
-from openerp import models, fields, api
-import paramiko
+import logging
+
+from odoo import api, fields, models
+
+_logger = logging.getLogger(__name__)
+
+try:
+    import paramiko
+except ImportError:
+    _logger.info('`paramiko` Python library is not installed')
 
 
 class ConnectorSftp(models.Model):
@@ -34,10 +42,10 @@ class ConnectorSftp(models.Model):
         required=True,
     )
     transport = fields.Binary(
-        store=False,
+        compute='_compute_client_and_transport',
     )
     client = fields.Binary(
-        store=False,
+        compute='_compute_client_and_transport',
     )
 
     _sql_constraints = [
@@ -45,38 +53,42 @@ class ConnectorSftp(models.Model):
     ]
 
     @api.multi
-    def _create_client(self):
-        '''
-        Establish SSH Transport and SFTP client.
+    @api.depends('host',
+                 'host_key',
+                 'password',
+                 'port',
+                 'private_key',
+                 'username',
+                 )
+    def _compute_client_and_transport(self):
+        """Establish SSH Transport and SFTP client.
 
         Raises:
-            :class:``paramiko.SSHException`` if the SSH2 negotiation fails,
-                the host key supplied by the server is incorrect, or
-                authentication fails.
-        '''
-        self.ensure_one()
-        if not self.transport or not self.client:
-            self.transport = paramiko.Transport((
-                self.host, self.port,
+            paramiko.SSHException: if the SSH2 negotiation fails,
+            the host key supplied by the server is incorrect, or
+            authentication fails.
+        """
+        for record in self:
+            record.transport = paramiko.Transport((
+                record.host, record.port,
             ))
-            if self.ignore_host_key:
+            if record.ignore_host_key:
                 host_key = None
             else:
-                host_key = self.host_key if self.host_key else None
-            self.transport.connect(
+                host_key = record.host_key if record.host_key else None
+            record.transport.connect(
                 hostkey=host_key,
-                username=self.username,
-                password=self.password,
-                pkey=self.private_key if self.private_key else None,
+                username=record.username,
+                password=record.password,
+                pkey=record.private_key if record.private_key else None,
             )
-            self.client = paramiko.SFTPClient.from_transport(
-                self.transport
+            record.client = paramiko.SFTPClient.from_transport(
+                record.transport,
             )
 
     @api.multi
-    def _sftp_listdir(self, path):
-        '''
-        Return a list containing the names of the entries in ``path``
+    def list_dir(self, path):
+        """Return a list containing the names of the entries in ``path``
 
         The list is in arbitrary order. It does not include the special
         entries ``'.'`` and ``'..'`` even if they are present in the folder.
@@ -84,18 +96,17 @@ class ConnectorSftp(models.Model):
         possible.
 
         Params:
-            path: str Path to list
+            path (str): Path to list
 
         Returns:
-            list of names in path
-        '''
-        self._create_client()
+            list: of names in path
+        """
+        self.ensure_one()
         return self.client.listdir(path)
 
     @api.multi
-    def _sftp_stat(self, path):
-        '''
-        Retrieve information about a file on remote system. Return value is
+    def stat(self, path):
+        """Retrieve information about a file on remote system. Return value is
         an obj whose attributes correspond to the structure of the stdlib
         ``os.stat``, except that it may be lacking fields due to SFTP server
         configuration.
@@ -107,57 +118,53 @@ class ConnectorSftp(models.Model):
         `st_gid``, ``st_atime``, and ``st_mtime``.
 
         Params:
-            path: str Filename to stat
+            path (str): Filename to stat
 
         Returns:
-            :class:``paramiko.SFTPAttributes`` object containing attrs about
-                file
-        '''
-        self._create_client()
+            paramiko.SFTPAttributes: object containing attributes about file.
+        """
+        self.ensure_one()
         return self.client.stat(path)
 
     @api.multi
-    def _sftp_open(self, file_name, mode='r', buff_size=-1):
-        '''
-        Open file on remote server. Mimicks python open function, and result
+    def open(self, file_name, mode='r', buff_size=-1):
+        """Open file on remote server. Mimicks python open function, and result
         can be used as a context manager.
 
         Params:
-            file_name: str File to open
-            mode: str How to open file, reference Python open
-            buff_size: int Desired buffering
+            file_name (str): File to open
+            mode (str); How to open file, reference Python open
+            buff_size (int): Desired buffering
 
         Returns:
-            :class:``paramiko.SFTPFile object`` representing the open file
+            paramiko.SFTPFile object: representing the open file
 
         Raises:
             IOError: if the file cannot be opened
-        '''
-        self._create_client()
+        """
+        self.ensure_one()
         return self.client.open(file_name, mode, buff_size)
 
     @api.multi
-    def _sftp_unlink(self, path):
-        '''
-        Remove the file at the given path. Does not work on dirs
+    def delete(self, path):
+        """Remove the file at the given path. Does not work on directories.
 
         Params:
-            path: str Path to file to delete
+            path (str): Path of file to delete.
 
         Raises:
-            IOError: if path refers to a directory
-        '''
-        self._create_client()
+            IOError: if path refers to a directory.
+        """
+        self.ensure_one()
         return self.client.unlink(path)
 
     @api.multi
-    def _sftp_symlink(self, source, dest):
-        '''
-        Create a symbolic link of the source path at destination on remote
+    def symlink(self, source, dest):
+        """Create a symbolic link of the source path at destination on remote.
 
         Params:
-            source: str Path of original file
-            dest: str Path of new symlink
-        '''
-        self._create_client()
+            source (str): Path of original file
+            dest (str): Path of new symlink
+        """
+        self.ensure_one()
         return self.client.symlink(source, dest)

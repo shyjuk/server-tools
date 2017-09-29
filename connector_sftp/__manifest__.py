@@ -12,14 +12,15 @@
     "license": "LGPL-3",
     "application": False,
     "installable": True,
+    "depends": [
+        "base_external_system",
+    ],
     "external_dependencies": {
         "python": [
             'paramiko',
         ],
     },
     'data': [
-        'views/connector_sftp_view.xml',
-        'views/res_company_view.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [

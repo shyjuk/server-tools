@@ -4,7 +4,8 @@
 
 import logging
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -16,75 +17,40 @@ except ImportError:
 
 class ConnectorSftp(models.Model):
     _name = 'connector.sftp'
+    _inherit = 'external.system.adapter'
     _description = 'SFTP Connector'
 
-    name = fields.Char(
-        required=True,
-    )
-    host = fields.Char(
-        required=True,
-    )
-    port = fields.Integer(
-        required=True,
-        default=22,
-    )
-    username = fields.Char(
-        required=True,
-    )
-    password = fields.Char()
-    private_key = fields.Text()
-    host_key = fields.Text()
-    ignore_host_key = fields.Boolean()
-    company_id = fields.Many2one(
-        string='Company',
-        comodel_name='res.company',
-        inverse_name='sftp_connector_ids',
-        required=True,
-    )
-    transport = fields.Binary(
-        compute='_compute_client_and_transport',
-    )
-    client = fields.Binary(
-        compute='_compute_client_and_transport',
-    )
-
-    _sql_constraints = [
-        ('name_uniq', 'UNIQUE(name)', 'Connection name must be unique.'),
-    ]
+    @api.multi
+    def external_get_client(self):
+        """Return a usable SFTP client."""
+        super(ConnectorSftp, self).external_get_client()
+        transport = paramiko.Transport((
+            self.host, self.port,
+        ))
+        fingerprint = self.fingerprint or None
+        transport.connect(
+            hostkey=fingerprint,
+            username=self.username,
+            password=self.password,
+            pkey=self.private_key or None,
+        )
+        return paramiko.SFTPClient.from_transport(transport)
 
     @api.multi
-    @api.depends('host',
-                 'host_key',
-                 'password',
-                 'port',
-                 'private_key',
-                 'username',
-                 )
-    def _compute_client_and_transport(self):
-        """Establish SSH Transport and SFTP client.
+    def external_destroy_client(self, client):
+        """Close the connection."""
+        super(ConnectorSftp, self).external_destroy_client(client)
+        if client:
+            client.close()
 
-        Raises:
-            paramiko.SSHException: if the SSH2 negotiation fails,
-            the host key supplied by the server is incorrect, or
-            authentication fails.
-        """
-        for record in self:
-            record.transport = paramiko.Transport((
-                record.host, record.port,
-            ))
-            if record.ignore_host_key:
-                host_key = None
-            else:
-                host_key = record.host_key if record.host_key else None
-            record.transport.connect(
-                hostkey=host_key,
-                username=record.username,
-                password=record.password,
-                pkey=record.private_key if record.private_key else None,
-            )
-            record.client = paramiko.SFTPClient.from_transport(
-                record.transport,
-            )
+    @api.multi
+    def external_test_connection(self):
+        with self.client() as client:
+            if not client:
+                raise ValidationError(_(
+                    'The SFTP connection was not able to be established.',
+                ))
+        super(ConnectorSftp, self).external_test_connection()
 
     @api.multi
     def list_dir(self, path):
@@ -101,8 +67,8 @@ class ConnectorSftp(models.Model):
         Returns:
             list: of names in path
         """
-        self.ensure_one()
-        return self.client.listdir(path)
+        with self.client() as client:
+            return client.listdir(path)
 
     @api.multi
     def stat(self, path):
@@ -123,8 +89,8 @@ class ConnectorSftp(models.Model):
         Returns:
             paramiko.SFTPAttributes: object containing attributes about file.
         """
-        self.ensure_one()
-        return self.client.stat(path)
+        with self.client() as client:
+            return client.stat(path)
 
     @api.multi
     def open(self, file_name, mode='r', buff_size=-1):
@@ -142,8 +108,8 @@ class ConnectorSftp(models.Model):
         Raises:
             IOError: if the file cannot be opened
         """
-        self.ensure_one()
-        return self.client.open(file_name, mode, buff_size)
+        with self.client() as client:
+            return client.open(file_name, mode, buff_size)
 
     @api.multi
     def delete(self, path):
@@ -155,8 +121,8 @@ class ConnectorSftp(models.Model):
         Raises:
             IOError: if path refers to a directory.
         """
-        self.ensure_one()
-        return self.client.unlink(path)
+        with self.client() as client:
+            return client.unlink(path)
 
     @api.multi
     def symlink(self, source, dest):
@@ -166,5 +132,5 @@ class ConnectorSftp(models.Model):
             source (str): Path of original file
             dest (str): Path of new symlink
         """
-        self.ensure_one()
-        return self.client.symlink(source, dest)
+        with self.client() as client:
+            return client.symlink(source, dest)

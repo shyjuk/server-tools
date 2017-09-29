@@ -7,8 +7,9 @@
 
 <odoo>
 
-    <record id="connector_sftp_example" model="connector.sftp">
+    <record id="connector_sftp_example" model="external.system">
         <field name="name">Example SFTP Connection</field>
+        <field name="system_type">connector.sftp</field>
         <field name="host">sftp.example.com</field>
         <field name="port">22</field>
         <field name="username">Test</field>
@@ -64,7 +65,7 @@ pPfJ1dA3cD4gGLI9H5l1W2ORvrCDwlRoXiFoXfmDAmRoxG0Rhaf6jhPwcwiiJSOb
 KkXPfxHHBqQzepIJ1qVjxAraXWxQSPlquKw5Shm/JdGdpxGpDZdfnoBZTwbwB4KH
 gKnvy9Dd0LVOLW1SuekkqZnaPq+bZsd0EEMmJgwQ/Gh42IX650n8rcXaLJc=
 -----END RSA PRIVATE KEY-----]]></field>
-        <field name="company_id" ref="base.main_company" />
+        <field name="company_ids" eval="[(5, 0), (4, ref('base.main_company'))]" />
     </record>
 
 </odoo>

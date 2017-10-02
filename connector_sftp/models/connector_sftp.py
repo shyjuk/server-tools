@@ -4,6 +4,8 @@
 
 import logging
 
+from io import StringIO
+
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
@@ -28,11 +30,18 @@ class ConnectorSftp(models.Model):
             self.host, self.port,
         ))
         fingerprint = self.fingerprint or None
+        if self.private_key:
+            with StringIO(self.private_key) as io:
+                private_key = paramiko.RSAKey.from_private_key(
+                    io, self.private_key_password or None,
+                )
+        else:
+            private_key = None
         transport.connect(
             hostkey=fingerprint,
             username=self.username,
-            password=self.password,
-            pkey=self.private_key or None,
+            password=self.password or None,
+            pkey=private_key,
         )
         return paramiko.SFTPClient.from_transport(transport)
 

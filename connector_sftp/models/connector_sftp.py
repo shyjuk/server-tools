@@ -43,7 +43,10 @@ class ConnectorSftp(models.Model):
             password=self.password or None,
             pkey=private_key,
         )
-        return paramiko.SFTPClient.from_transport(transport)
+        client = paramiko.SFTPClient.from_transport(transport)
+        if self.remote_path:
+            client.chdir(self.remote_path)
+        return client
 
     @api.multi
     def external_destroy_client(self, client):

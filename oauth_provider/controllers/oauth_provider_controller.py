@@ -199,7 +199,7 @@ class OAuth2ProviderController(OauthMixin):
         # Add the oauth user identifier, if user's information access is
         # allowed by the token's scopes
         user_data = token.get_data(
-            'res.users', record_ids=token.user_id.id)
+            'res.users', record_ids=token.user_id.ids)
         if 'id' in user_data:
             data.update(user_id=token.generate_user_id())
         return self._json_response(data=data)
@@ -220,7 +220,7 @@ class OAuth2ProviderController(OauthMixin):
             return self._json_response(
                 data={'error': 'invalid_or_expired_token'}, status=401)
 
-        data = token.get_data('res.users', record_ids=token.user_id.id)
+        data = token.get_data('res.users', record_ids=token.user_id.ids)
         return self._json_response(data=data)
 
     @http.route('/oauth2/otherinfo',

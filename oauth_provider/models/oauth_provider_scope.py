@@ -79,8 +79,8 @@ class OauthProviderScope(models.Model):
 
         Args:
             model_name (str): Name of the model to operate on.
-            record_idss (int or list of ints): ID of record(s) to find. Will
-                only return this record, if defined.
+            record_ids (list[int]): ID of record(s) to find. Will only return
+                this record, if defined.
             all_scopes_match (bool): True to filter out records that do not
                 match all of the scopes in the current recordset.
             domain (list of tuples, optional): Domain to append to the
@@ -93,9 +93,6 @@ class OauthProviderScope(models.Model):
                 If `record_ids` is defined, and only one ID, the inner data
                 dictionary will be returned without nesting.
         """
-
-        if isinstance(record_ids, int):
-            record_ids = [record_ids]
 
         data = defaultdict(dict)
         eval_context = self.ir_filter_eval_context
@@ -244,7 +241,7 @@ class OauthProviderScope(models.Model):
         Args:
             eval_context (dict): Base eval context, such as provided by
                 `ir_filter_eval_context`
-            record_id (int or list of ints): ID of record(s) to explicitly
+            record_ids (list[ints], optional): ID of record(s) to explicitly
                 query.
 
         Returns:
@@ -255,8 +252,6 @@ class OauthProviderScope(models.Model):
 
         if record_ids is None:
             record_ids = []
-        elif isinstance(record_ids, int):
-            record_ids = [record_ids]
 
         filter_domain = [(1, '=', 1)]
 
@@ -284,7 +279,7 @@ class OauthProviderScope(models.Model):
                 by `ir_filter_eval_context`.
             add_domain (list of tuples, optional): Domain to append to the
                 `filter_domain` that is defined in the scope.
-            record_id (int or list of ints): ID of record to find. Will
+            record_ids (list[int], optional): ID of record to find. Will
                 only return this record, if defined.
 
         Returns:
@@ -310,9 +305,9 @@ class OauthProviderScope(models.Model):
             bool: Indicating whether the records are within scope.
         """
 
-        scoped_records = self.env[records._name].browse()
+        scoped_records = self.env[records._name]
         for scope in self:
-            scoped_records += scope._get_scoped_records(
+            scoped_records |= scope._get_scoped_records(
                 records._name,
             )
         return all([
@@ -335,7 +330,7 @@ class OauthProviderScope(models.Model):
             bool: Whether the values are within the scope.
         """
         scopes = self.filter_by_model(model)
-        field_names = scopes.mapped('field_ids').mapped('name')
+        field_names = scopes.mapped('field_ids.name')
         if not field_names:
             return True
         return all([

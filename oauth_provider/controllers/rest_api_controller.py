@@ -58,7 +58,7 @@ class RestApiController(OauthMixin):
         """
         token = self._validate_token(access_token)
         self._validate_model(model)
-        data = token.get_data(model, record_id)
+        data = token.get_data(model, [record_id])
         return data
 
     @http.route(
@@ -83,7 +83,7 @@ class RestApiController(OauthMixin):
         token = self._validate_token(access_token)
         self._validate_model(model)
         record = token.create_record(model, kwargs)
-        return token.get_data(model, record.id)
+        return token.get_data(model, record.ids)
 
     @http.route(
         ['/api/rest/%s/<string:model>/<int:record_id>' % API_VERSION,
@@ -116,7 +116,7 @@ class RestApiController(OauthMixin):
         token = self._validate_token(access_token)
         self._validate_model(model)
         record = token.write_record(model, record_ids, kwargs)
-        return token.get_data(model, record.id)
+        return token.get_data(model, record.ids)
 
     @http.route(
         ['/api/rest/%s/<string:model>/<int:record_id>' % API_VERSION,

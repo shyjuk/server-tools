@@ -87,7 +87,7 @@ class TestOauthProviderScope(TransactionCase):
         scope = self.new_scope({'filter_id': False})
 
         # Check a simple call with the right model
-        data = scope.get_data('res.users', record_ids=self.env.user.id)
+        data = scope.get_data('res.users', record_ids=self.env.user.ids)
         self.assertEqual(data, {
             'id': self.env.user.id,
             'email': self.env.user.email,
@@ -101,7 +101,7 @@ class TestOauthProviderScope(TransactionCase):
 
         # Check a simple call with a wrong model
         data = scope.get_data(
-            'res.partner', record_ids=self.env.user.id + 1)
+            'res.partner', record_ids=[self.env.user.id + 1])
         self.assertEqual(data, {})
 
     def test_get_data_with_record_ids(self):
@@ -111,7 +111,7 @@ class TestOauthProviderScope(TransactionCase):
         scope = self.new_scope()
 
         # Check a simple call with the right model
-        data = scope.get_data('res.users', record_ids=self.env.user.id)
+        data = scope.get_data('res.users', record_ids=self.env.user.ids)
         self.assertEqual(data, {
             'id': self.env.user.id,
             'email': self.env.user.email,
@@ -125,7 +125,7 @@ class TestOauthProviderScope(TransactionCase):
 
         # Check a simple call with a wrong model
         data = scope.get_data(
-            'res.partner', record_ids=self.env.user.id + 1)
+            'res.partner', record_ids=[self.env.user.id + 1])
         self.assertEqual(data, {})
 
     def _generate_multiple_scopes(self):

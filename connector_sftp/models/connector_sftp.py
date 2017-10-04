@@ -4,6 +4,7 @@
 
 import logging
 
+from contextlib import contextmanager
 from io import StringIO
 
 from odoo import api, fields, models, _
@@ -105,6 +106,7 @@ class ConnectorSftp(models.Model):
             return client.stat(path)
 
     @api.multi
+    @contextmanager
     def open(self, file_name, mode='r', buff_size=-1):
         """Open file on remote server. Mimicks python open function, and result
         can be used as a context manager.
@@ -121,7 +123,8 @@ class ConnectorSftp(models.Model):
             IOError: if the file cannot be opened
         """
         with self.client() as client:
-            return client.open(file_name, mode, buff_size)
+            with client.open(file_name, mode, buff_size) as fh:
+                yield fh
 
     @api.multi
     def delete(self, path):

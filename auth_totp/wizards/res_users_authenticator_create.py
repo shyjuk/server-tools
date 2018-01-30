@@ -3,7 +3,8 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 import logging
-import urllib
+#import urllib
+import urllib.parse
 from openerp import _, api, fields, models
 from openerp.exceptions import ValidationError
 
@@ -77,7 +78,7 @@ class ResUsersAuthenticatorCreate(models.TransientModel):
                 record.user_id.display_name,
                 issuer_name=record.user_id.company_id.display_name,
             )
-            provisioning_uri = urllib.quote(provisioning_uri)
+            provisioning_uri = urllib.parse.quote(provisioning_uri)
 
             qr_width = qr_height = 300
             tag_base = '<img src="/report/barcode/?type=QR&amp;'
